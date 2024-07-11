@@ -1,56 +1,40 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
-orbs:
-  node: circleci/node@5
+
+executors:
+  docker-executor:
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/repo
+
 jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
+  build-and-push:
+    executor: docker-executor
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      
-  build-node:
-    # Build node project
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - setup_remote_docker:
+          version: 20.10.7
       - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Build React App
           command: npm run build
       - run:
           name: Build Docker Image
           command: docker build -t my-react-app:latest .
-      
       - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
+          name: Login to Docker Hub
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
       - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
+          name: Tag Docker Image
+          command: docker tag my-react-app:latest $DOCKERHUB_USERNAME/my-react-app:latest
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Push Docker Image to Docker Hub
+          command: docker push $DOCKERHUB_USERNAME/my-react-app:latest
+
 workflows:
-  build-and-test:
+  version: 2
+  build_and_push:
     jobs:
-      - test-node
-      - build-node:
-          requires:
-            - test-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+      - build-and-push
