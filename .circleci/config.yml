@@ -21,17 +21,17 @@ jobs:
           command: npm run build
       - run:
           name: Build Docker Image
-          command: docker build -t my-react-app:latest .
+          command: docker build -t devopsfe:latest .
       - run:
           name: Login to Docker Hub
           command: |
-            echo ABC123ssi | docker login -u abdulghafoor --password-stdin
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 180432984958.dkr.ecr.us-east-2.amazonaws.com
       - run:
           name: Tag Docker Image
-          command: docker tag my-react-app:latest abdulghafoor/my-react-app:latest
+          command: docker tag devopsfe:latest 180432984958.dkr.ecr.us-east-2.amazonaws.com/devopsfe:latest
       - run:
           name: Push Docker Image to Docker Hub
-          command: docker push abdulghafoor/my-react-app:latest
+          command: docker push 180432984958.dkr.ecr.us-east-2.amazonaws.com/devopsfe:latest
 
 workflows:
   version: 2
