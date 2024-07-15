@@ -20,7 +20,7 @@ jobs:
           name: Build React App
           command: npm run build
       - run:
-          name: Build Docker Image ok
+          name: Build Docker Image okk
           command: docker build -t devopsfe:latest .
       - run:
           name: Login to Docker Hub
