@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Login to Docker Hub
           command: |
-            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 180432984958.dkr.ecr.us-east-2.amazonaws.com
+            aws ecr get-login-password --region us-east-2  --profile devopsprofile | docker login --username AWS --password-stdin  180432984958.dkr.ecr.us-east-2.amazonaws.com
       - run:
           name: Tag Docker Image
           command: docker tag devopsfe:latest 180432984958.dkr.ecr.us-east-2.amazonaws.com/devopsfe:latest
